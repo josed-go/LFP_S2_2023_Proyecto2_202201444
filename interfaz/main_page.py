@@ -3,6 +3,8 @@ import tkinter.font as font
 from tkinter import ttk, filedialog, messagebox
 import os
 
+from analizador.analizador import analizador
+
 class main_page:
     def __init__(self, raiz):
         self.archivo = ""
@@ -10,7 +12,7 @@ class main_page:
 
         self.variable_archivo = tk.StringVar()
         self.variable_archivo.set("")
-        # self.analizador = analizador()
+        self.analizador = analizador()
 
         self.raiz = raiz
         self.cantidad_lineas = 1
@@ -56,8 +58,8 @@ class main_page:
 
         self.opciones_menu = tk.Menu(self.menu, tearoff=0, background='#fdf9c4')
         self.opciones_menu.add_command(label="Abrir", background='#fdf9c4', command = self.abrir_archivo)
-        self.opciones_menu.add_command(label="Guardar", background='#fdf9c4')
-        self.opciones_menu.add_command(label="Guardar como", background='#fdf9c4')
+        self.opciones_menu.add_command(label="Guardar", background='#fdf9c4', command = self.guardar_archivo)
+        self.opciones_menu.add_command(label="Guardar como", background='#fdf9c4', command = self.guardar_como)
         self.opciones_menu.add_separator(background='#fdf9c4')
         self.opciones_menu.add_command(label="Salir", background='#fdf9c4', command=self.raiz.quit)
 
@@ -69,7 +71,7 @@ class main_page:
         self.label.grid(row=0, column=0, padx=10, pady=10)
         self.label['font'] = self.fuente
 
-        self.analizar_B = tk.Button(self.menu_frame, text="Analizar", padx=5, height=1, bg="#fdf9c4", activebackground="#ffda9e")
+        self.analizar_B = tk.Button(self.menu_frame, text="Analizar", padx=5, height=1, bg="#fdf9c4", activebackground="#ffda9e", command = self.analizar)
         self.analizar_B.grid(row=0, column=1, padx=5, pady=10)
         self.analizar_B['font'] = self.fuente
 
@@ -116,6 +118,30 @@ class main_page:
                 self.editor.delete("1.0", tk.END)
                 self.editor.insert("1.0", self.datos_archivo)
             self.actualizar_lineas()
+
+    def guardar_archivo(self):
+        if self.editor and self.archivo:
+            try:
+                self.datos_archivo = self.editor.get("1.0", tk.END)
+                with open(self.archivo, 'w') as file:
+                    file.write(self.editor.get("1.0", tk.END))
+                messagebox.showinfo("Exito!", "El archivo se ha guardado correctamente")
+            except Exception as e:
+                messagebox.showinfo("Error!", "Error al guardar el archivo "+ str(e))
+
+    def guardar_como(self):
+        if self.editor:
+            self.archivo = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Archivo JSON", "*.json")])
+            self.nombre_archivo(self.archivo)
+            self.datos_archivo = self.editor.get("1.0", tk.END)
+            if self.archivo:
+                with open(self.archivo, "w") as file:
+                    file.write(self.editor.get("1.0", tk.END))
+            messagebox.showinfo("Exito!", "El archivo se ha guardado correctamente")
+
+    def analizar(self):
+        if self.datos_archivo != '':
+            self.analizador.analizar(self.datos_archivo)
 
     def nombre_archivo(self, nombre):
         name = os.path.basename(nombre)
