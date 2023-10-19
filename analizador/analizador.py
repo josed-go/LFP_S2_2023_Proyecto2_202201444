@@ -3,6 +3,7 @@ from clases.numero import *
 from clases.error import *
 from clases.imprimir import *
 from clases.imprimirln import *
+from clases.conteo import *
 
 class analizador:
     def __init__(self):
@@ -179,6 +180,7 @@ class analizador:
                     elif char == '\n':
                         self.numero_linea += 1
                     else:
+                        cont = 0
                         lexema += char
         else:
             # print("aqu")
@@ -259,8 +261,15 @@ class analizador:
                                     punto_coma = self.lista_lexema.pop(0)
                                     if punto_coma.operar(None) == ';':
                                         return Imprimirln(texto.lexema, lexema.obtener_Fila(), lexema.obtener_Columna())
-                elif lexema.operar(None) == "b":
-                    pass
+                elif lexema.operar(None) == "conteo":
+                    lexema = self.lista_lexema.pop(0)
+                    if lexema.operar(None) == '(':
+                        parentesis = self.lista_lexema.pop(0)
+                        if parentesis.operar(None) == ')':
+                            punto_coma = self.lista_lexema.pop(0)
+                            if punto_coma.operar(None) == ';':
+
+                                return Conteo(self.get_conteo(), lexema.obtener_Fila(), lexema.obtener_Columna())
 
             else:
                 return "MALOOOO"
@@ -316,7 +325,10 @@ class analizador:
                 self.registros.append(lista_temp)
                 lista_temp = []
 
-            llave_cierre = self.lista_lexema.pop(0).operar(None)        
+            llave_cierre = self.lista_lexema.pop(0).operar(None)    
+
+    def get_conteo(self):
+        return str(len(self.registros))
 
             
     def armar_claves(self):
