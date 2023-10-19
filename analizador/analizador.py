@@ -1,6 +1,8 @@
 from clases.lexema import *
 from clases.numero import *
 from clases.error import *
+from clases.imprimir import *
+from clases.imprimirln import *
 
 class analizador:
     def __init__(self):
@@ -125,6 +127,7 @@ class analizador:
         # print("ERRORES")
         # for error in self.lista_errores:
         #     print(error.lexema)
+        return self.lista_lexema
 
     def armar_lexema(self, cadena):
         lexema = ''
@@ -132,8 +135,8 @@ class analizador:
 
         for char in cadena:
             puntero += char
-            if char == ' ' or char == '\"':
-                return lexema , cadena[len(puntero)-1:]
+            if  char == '\"' or char == "(" or char == "=" or char == "[":
+                return lexema.strip(), cadena[len(puntero)-1:]
             else :
                 lexema += char
 
@@ -216,7 +219,8 @@ class analizador:
                         
                     else:
                         return print("ERROR")
-
+                    print(self.claves)
+                    
                 elif lexema.operar(None) == "Registros":
                     sig_igual = self.lista_lexema.pop(0)
 
@@ -227,17 +231,40 @@ class analizador:
 
                             self.armar_registros()
 
-
+                    print(self.registros)
                 elif lexema.operar(None) == "imprimir":
-                    pass
-                elif lexema.operar(None) == "a":
-                    pass
+                    lexema = self.lista_lexema.pop(0)
+                    if lexema.operar(None) == '(':
+                        comillas = self.lista_lexema.pop(0)
+                        if comillas.operar(None) == '"':
+                            texto = self.lista_lexema.pop(0)
+                            comillas = self.lista_lexema.pop(0)
+                            if comillas.operar(None) == '"':
+                                parentesis = self.lista_lexema.pop(0)
+                                if parentesis.operar(None) == ')':
+                                    punto_coma = self.lista_lexema.pop(0)
+                                    if punto_coma.operar(None) == ';':
+                                        return Imprimir(texto.lexema, lexema.obtener_Fila(), lexema.obtener_Columna())
+                                    
+                elif lexema.operar(None) == "imprimirln":
+                    lexema = self.lista_lexema.pop(0)
+                    if lexema.operar(None) == '(':
+                        comillas = self.lista_lexema.pop(0)
+                        if comillas.operar(None) == '"':
+                            texto = self.lista_lexema.pop(0)
+                            comillas = self.lista_lexema.pop(0)
+                            if comillas.operar(None) == '"':
+                                parentesis = self.lista_lexema.pop(0)
+                                if parentesis.operar(None) == ')':
+                                    punto_coma = self.lista_lexema.pop(0)
+                                    if punto_coma.operar(None) == ';':
+                                        return Imprimirln(texto.lexema, lexema.obtener_Fila(), lexema.obtener_Columna())
                 elif lexema.operar(None) == "b":
                     pass
 
-
             else:
                 return "MALOOOO"
+        return None
             
     def recursivo_operar(self):
         while True:
@@ -290,7 +317,7 @@ class analizador:
                 lista_temp = []
 
             llave_cierre = self.lista_lexema.pop(0).operar(None)        
-            
+
             
     def armar_claves(self):
         sig2 = ""

@@ -2,6 +2,8 @@ import tkinter as tk
 import tkinter.font as font
 from tkinter import ttk, filedialog, messagebox
 import os
+from clases.imprimir import *
+from clases.imprimirln import *
 
 from analizador.analizador import analizador
 
@@ -50,7 +52,7 @@ class main_page:
         self.scroll_editor.grid(row=0, column=0, pady=25, sticky="nse")
         self.editor.config(yscrollcommand=self.scroll_editor.set)
 
-        self.consola = tk.Text(self.editor_frame, width="40", height="39", padx=35, pady=20, font=('Arial', 12), borderwidth=2, relief="solid")
+        self.consola = tk.Text(self.editor_frame, background='#e6e6e6', width="45", height="39", padx=10, pady=20, font=('Arial', 12), borderwidth=2, relief="solid")
         self.consola.grid(row=0, column=1, padx=10, pady=25)
 
         self.menu = tk.Menu(self.raiz, background='blue', fg='white')
@@ -140,9 +142,39 @@ class main_page:
             messagebox.showinfo("Exito!", "El archivo se ha guardado correctamente")
 
     def analizar(self):
+        imprimir_consola = ''
+        flechas = ">>>"
         if self.datos_archivo != '':
-            self.analizador.analizador_lexico(self.datos_archivo)
-            self.analizador.recursivo_operar()
+            ins = self.analizador.analizador_lexico(self.datos_archivo)
+            # self.analizador.recursivo_operar()
+
+            lista_instrucciones = []
+            while True:
+                instrucciones_lenguaje = self.analizador.analizador_sintactico()
+                if instrucciones_lenguaje:
+                    lista_instrucciones.append(instrucciones_lenguaje)
+                else:
+                    break
+
+            # Ejecutar instrucciones
+
+            for elemento in lista_instrucciones:
+                if isinstance(elemento, Imprimir):
+                    # if int(self.consola.index('end-1c').split('.')[0]) == 1:
+                    #     self.consola.insert(tk.END, ">>>")
+                    imprimir_consola += elemento.ejecutarT()+" "
+                elif isinstance(elemento, Imprimirln):
+                    # if int(self.consola.index('end-1c').split('.')[0]) == 1:
+                    #     self.consola.insert(tk.END, ">>>")
+                    imprimir_consola += "\n"+elemento.ejecutarT()+" "
+
+            lineas = [f"{flechas} {line}" for line in imprimir_consola.split('\n') if line.strip()]
+            for line in lineas:
+                self.consola.insert(tk.END, line + "\n")
+        # self.consola.config(state='normal')
+            # self.consola.insert(tk.END, imprimir_consola)
+            self.consola.config(state='disabled')
+            messagebox.showinfo("Análisis exitoso", "El código se analizó exitosamente.")
 
     def nombre_archivo(self, nombre):
         name = os.path.basename(nombre)
