@@ -141,7 +141,8 @@ class main_page:
 
     def analizar(self):
         if self.datos_archivo != '':
-            self.analizador.analizar(self.datos_archivo)
+            self.analizador.analizador_lexico(self.datos_archivo)
+            self.analizador.recursivo_operar()
 
     def nombre_archivo(self, nombre):
         name = os.path.basename(nombre)

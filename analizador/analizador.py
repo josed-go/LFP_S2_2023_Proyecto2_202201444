@@ -11,6 +11,9 @@ class analizador:
         self.lista_instrucciones = []
         self.lista_errores = []
 
+        self.claves = []
+        self.registros = []
+
         self.palabra_reservadas = {
             'CLAVES': 'Claves',
             'REGISTROS': 'Registros',
@@ -28,7 +31,8 @@ class analizador:
 
         self.palabras = list(self.palabra_reservadas.values())
 
-    def analizar(self, cadena):
+    def analizador_lexico(self, cadena):
+        print(self.palabras)
         # print("aqui")
         lexema = ''
         puntero = 0
@@ -186,3 +190,131 @@ class analizador:
                     
 
         return None, None
+    
+    def analizador_sintactico(self):
+        palabra = ''
+        sig_igual= ''
+        corchete_in = ''
+        corchete_fin = ''
+        llave_in = ''
+        comilla = ''
+
+        while self.lista_lexema:
+            lexema = self.lista_lexema.pop(0)
+            if lexema.operar(None) in self.palabras:
+                if lexema.operar(None) == "Claves":
+                    sig = self.lista_lexema.pop(0)
+
+                    if sig.operar(None) == "=":
+                        sig = self.lista_lexema.pop(0)
+
+                        if sig.operar(None) == "[":
+
+                            self.armar_claves()
+                        else:
+                            return print("ERROR")
+                        
+                    else:
+                        return print("ERROR")
+
+                elif lexema.operar(None) == "Registros":
+                    sig_igual = self.lista_lexema.pop(0)
+
+                    if sig_igual.operar(None) == "=":
+                        corchete_in = self.lista_lexema.pop(0)
+
+                        if corchete_in.operar(None) == "[":
+
+                            self.armar_registros()
+
+
+                elif lexema.operar(None) == "imprimir":
+                    pass
+                elif lexema.operar(None) == "a":
+                    pass
+                elif lexema.operar(None) == "b":
+                    pass
+
+
+            else:
+                return "MALOOOO"
+            
+    def recursivo_operar(self):
+        while True:
+            operacion = self.analizador_sintactico()
+            if operacion:
+                self.lista_instrucciones.append(operacion)
+            else :
+                break
+
+        # for instur in self.lista_instrucciones:
+        #     print(instur.tipo.operar(None))
+        
+        return self.lista_instrucciones
+    
+    def armar_registros(self):
+        comilla = ''
+        llave_in = ''
+        llave_cierre = ''
+        regis = ''
+
+        llave_in = self.lista_lexema.pop(0)
+
+        lista_temp = []
+
+        while llave_cierre != "]":
+
+            if llave_in.operar(None) == "{":
+
+                sig = self.lista_lexema.pop(0)
+                while sig.operar(None) != "}":
+
+                    if sig.operar(None) == "\"":
+
+                        regis = self.lista_lexema.pop(0)
+                        comilla = self.lista_lexema.pop(0)
+
+                        if comilla.operar(None) == "\"":
+                            lista_temp.append(regis.operar(None))
+                    elif sig.operar(None) == ",":
+
+                        sig = self.lista_lexema.pop(0)
+                        continue
+                    else:
+
+                        lista_temp.append(sig.operar(None))
+
+                    sig = self.lista_lexema.pop(0)
+
+                self.registros.append(lista_temp)
+                lista_temp = []
+
+            llave_cierre = self.lista_lexema.pop(0).operar(None)        
+            
+            
+    def armar_claves(self):
+        sig2 = ""
+        prueba = self.lista_lexema.pop(0)
+
+        if prueba.operar(None) == "\"":
+            col = self.lista_lexema.pop(0)
+
+            sig = self.lista_lexema.pop(0)
+
+            if sig.operar(None) == "\"":
+                self.claves.append(col.operar(None))
+                sig2 = self.lista_lexema.pop(0)
+
+            else:
+                return print("ERRROE1")
+            
+            if sig2.operar(None) == ",":
+                    self.armar_claves()
+
+            elif sig2.operar(None) == "]":
+                pass
+            else:
+                return print("ERRROE2")
+
+        else:
+            return print("ERROR")
