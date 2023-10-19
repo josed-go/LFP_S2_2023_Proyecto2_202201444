@@ -4,6 +4,7 @@ from clases.error import *
 from clases.imprimir import *
 from clases.imprimirln import *
 from clases.conteo import *
+from clases.promedio import *
 
 class analizador:
     def __init__(self):
@@ -261,6 +262,7 @@ class analizador:
                                     punto_coma = self.lista_lexema.pop(0)
                                     if punto_coma.operar(None) == ';':
                                         return Imprimirln(texto.lexema, lexema.obtener_Fila(), lexema.obtener_Columna())
+                                    
                 elif lexema.operar(None) == "conteo":
                     lexema = self.lista_lexema.pop(0)
                     if lexema.operar(None) == '(':
@@ -270,6 +272,23 @@ class analizador:
                             if punto_coma.operar(None) == ';':
 
                                 return Conteo(self.get_conteo(), lexema.obtener_Fila(), lexema.obtener_Columna())
+                            
+                elif lexema.operar(None) == "promedio":
+                    lexema = self.lista_lexema.pop(0)
+                    if lexema.operar(None) == '(':
+                        comillas = self.lista_lexema.pop(0)
+                        if comillas.operar(None) == '"':
+                            campo = self.lista_lexema.pop(0)
+                            comillas = self.lista_lexema.pop(0)
+                            if comillas.operar(None) == '"':
+                                parentesis = self.lista_lexema.pop(0)
+                                if parentesis.operar(None) == ')':
+                                    punto_coma = self.lista_lexema.pop(0)
+                                    if punto_coma.operar(None) == ';':
+
+                                        resultado = self.promedio(campo.lexema)
+
+                                        return Promedio(resultado, lexema.obtener_Fila(), lexema.obtener_Columna())
 
             else:
                 return "MALOOOO"
@@ -329,6 +348,22 @@ class analizador:
 
     def get_conteo(self):
         return str(len(self.registros))
+
+    def promedio(self, campo):
+        index = ''
+        cantidad_reg = len(self.registros)
+        suma = 0
+        if campo in self.claves:
+            index = self.claves.index(campo)
+
+            for i in range(0, len(self.registros)):
+                # if self.registros[i][index].isalpha():
+                #     return None
+                suma += self.registros[i][index]
+
+            return str(suma/cantidad_reg)
+
+        return None
 
             
     def armar_claves(self):

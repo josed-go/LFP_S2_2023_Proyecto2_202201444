@@ -5,6 +5,7 @@ import os
 from clases.imprimir import *
 from clases.imprimirln import *
 from clases.conteo import *
+from clases.promedio import *
 
 from analizador.analizador import analizador
 
@@ -164,12 +165,12 @@ class main_page:
                     # if int(self.consola.index('end-1c').split('.')[0]) == 1:
                     #     self.consola.insert(tk.END, ">>>")
                     imprimir_consola += elemento.ejecutarT()+" "
-                elif isinstance(elemento, Imprimirln):
+                elif isinstance(elemento, Imprimirln) or isinstance(elemento, Conteo) or isinstance(elemento, Promedio):
                     # if int(self.consola.index('end-1c').split('.')[0]) == 1:
                     #     self.consola.insert(tk.END, ">>>")
                     imprimir_consola += "\n"+elemento.ejecutarT()+" "
-                elif isinstance(elemento, Conteo):
-                    imprimir_consola += "\n"+elemento.ejecutarT()+" "
+                # elif isinstance(elemento, Conteo):
+                #     imprimir_consola += "\n"+elemento.ejecutarT()+" "
 
             lineas = [f"{flechas} {line}" for line in imprimir_consola.split('\n') if line.strip()]
             for line in lineas:
