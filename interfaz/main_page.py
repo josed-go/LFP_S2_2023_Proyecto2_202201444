@@ -9,6 +9,7 @@ from clases.promedio import *
 from clases.datos import *
 from clases.suma import *
 from clases.maxmin import *
+from clases.reporte import *
 
 from analizador.analizador import analizador
 
@@ -172,8 +173,10 @@ class main_page:
                     # if int(self.consola.index('end-1c').split('.')[0]) == 1:
                     #     self.consola.insert(tk.END, ">>>")
                     imprimir_consola += "\n"+elemento.ejecutarT()+" "
+                
+                elif isinstance(elemento, Reporte):
                 # elif isinstance(elemento, Conteo):
-                #     imprimir_consola += "\n"+elemento.ejecutarT()+" "
+                    imprimir_consola += "\nReporte generado: "+elemento.ejecutarT()+" "
 
             lineas = [f"{flechas} {line}" for line in imprimir_consola.split('\n') if line.strip()]
             for line in lineas:

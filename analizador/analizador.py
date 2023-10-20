@@ -8,6 +8,7 @@ from clases.promedio import *
 from clases.datos import *
 from clases.suma import *
 from clases.maxmin import *
+from clases.reporte import *
 
 class analizador:
     def __init__(self):
@@ -357,6 +358,23 @@ class analizador:
                                         resultado = self.get_min(campo.lexema)
 
                                         return MaxMin(resultado, lexema.obtener_Fila(), lexema.obtener_Columna())
+                
+                elif lexema.operar(None) == "exportarReporte":
+                    lexema = self.lista_lexema.pop(0)
+                    if lexema.operar(None) == '(':
+                        comillas = self.lista_lexema.pop(0)
+                        if comillas.operar(None) == '"':
+                            titulo = self.lista_lexema.pop(0)
+                            comillas = self.lista_lexema.pop(0)
+                            if comillas.operar(None) == '"':
+                                parentesis = self.lista_lexema.pop(0)
+                                if parentesis.operar(None) == ')':
+                                    punto_coma = self.lista_lexema.pop(0)
+                                    if punto_coma.operar(None) == ';':
+
+                                        self.generar_reporte(titulo.lexema)
+
+                                        return Reporte(titulo.lexema, lexema.obtener_Fila(), lexema.obtener_Columna())
 
             else:
                 return "MALOOOO"
@@ -416,6 +434,72 @@ class analizador:
 
     def get_conteo(self):
         return str(len(self.registros))
+    
+    def generar_reporte(self, titulo):
+        print(titulo)
+        campos_data = ''
+        registros_data = ''
+        longitud = len(self.claves)
+        file = open(f"reporte_{titulo}.html", "w")
+
+
+        for campos in self.claves:
+            campos_data += f"<th>{campos}</th>\n"
+
+        for registros in self.registros:
+            registros_data += "<tr>\n"
+            for i in range(0, longitud):
+                registros_data += f"<th>{registros[i]}</th>\n"
+
+            registros_data += "</tr>\n"
+
+        html = f"""<!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>{titulo}</title>
+            </head>
+            <style>
+                body {{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: xx-large;
+                    padding-top: 150px;
+                }}
+                table {{
+                    border-collapse: collapse;
+                    border: 1px solid #000;
+                    padding: 15px;
+                }}
+                tr, th {{
+                    padding: 15px;
+                    border: 1px solid #000;
+                }}
+                .title {{
+                    background-color: #fdf9c4;
+                }}
+            </style>
+            <body>
+
+                <table>
+                    <tr class="title">
+                        <th colspan="{longitud}">{titulo}</th>
+                    </tr>
+                    <tr>
+                        {campos_data}
+                    </tr>
+                    {registros_data}
+
+                </table>
+                
+            </body>
+            </html>"""
+        
+        file.write(html)
+
+        file.close()
 
     def promedio(self, campo):
         index = ''
