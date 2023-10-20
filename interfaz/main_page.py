@@ -6,6 +6,7 @@ from clases.imprimir import *
 from clases.imprimirln import *
 from clases.conteo import *
 from clases.promedio import *
+from clases.datos import *
 
 from analizador.analizador import analizador
 
@@ -39,7 +40,7 @@ class main_page:
         self.editor_frame.pack()
         self.editor_frame.config(width="1350", height="800", bg="#fdf9c4")
 
-        self.editor = tk.Text(self.editor_frame, width="90", height="39", padx=35, pady=20, font=('Arial', 12))
+        self.editor = tk.Text(self.editor_frame, width="70", height="39", padx=35, pady=20, font=('Arial', 12))
         self.editor.grid(row=0, column=0, padx=10, pady=25, sticky="sw")
 
         self.lineas_bar = tk.Text(self.editor_frame, width=3, padx=4, pady=20, takefocus=0, border=0, background='lightgrey', state='disabled', font=('Arial', 12))
@@ -54,7 +55,7 @@ class main_page:
         self.scroll_editor.grid(row=0, column=0, pady=25, sticky="nse")
         self.editor.config(yscrollcommand=self.scroll_editor.set)
 
-        self.consola = tk.Text(self.editor_frame, background='#e6e6e6', width="45", height="39", padx=10, pady=20, font=('Arial', 12), borderwidth=2, relief="solid")
+        self.consola = tk.Text(self.editor_frame, background='#e6e6e6', width="65", height="39", padx=10, pady=20, font=('Arial', 12), borderwidth=2, relief="solid")
         self.consola.grid(row=0, column=1, padx=10, pady=25)
 
         self.menu = tk.Menu(self.raiz, background='blue', fg='white')
@@ -165,7 +166,7 @@ class main_page:
                     # if int(self.consola.index('end-1c').split('.')[0]) == 1:
                     #     self.consola.insert(tk.END, ">>>")
                     imprimir_consola += elemento.ejecutarT()+" "
-                elif isinstance(elemento, Imprimirln) or isinstance(elemento, Conteo) or isinstance(elemento, Promedio):
+                elif isinstance(elemento, Imprimirln) or isinstance(elemento, Conteo) or isinstance(elemento, Promedio) or isinstance(elemento, Datos):
                     # if int(self.consola.index('end-1c').split('.')[0]) == 1:
                     #     self.consola.insert(tk.END, ">>>")
                     imprimir_consola += "\n"+elemento.ejecutarT()+" "

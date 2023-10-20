@@ -5,6 +5,7 @@ from clases.imprimir import *
 from clases.imprimirln import *
 from clases.conteo import *
 from clases.promedio import *
+from clases.datos import *
 
 class analizador:
     def __init__(self):
@@ -129,6 +130,7 @@ class analizador:
         # print("ERRORES")
         # for error in self.lista_errores:
         #     print(error.lexema)
+
         return self.lista_lexema
 
     def armar_lexema(self, cadena):
@@ -223,6 +225,8 @@ class analizador:
                     else:
                         return print("ERROR")
                     print(self.claves)
+
+                    
                     
                 elif lexema.operar(None) == "Registros":
                     sig_igual = self.lista_lexema.pop(0)
@@ -235,6 +239,7 @@ class analizador:
                             self.armar_registros()
 
                     print(self.registros)
+                    self.get_datos()
                 elif lexema.operar(None) == "imprimir":
                     lexema = self.lista_lexema.pop(0)
                     if lexema.operar(None) == '(':
@@ -289,6 +294,16 @@ class analizador:
                                         resultado = self.promedio(campo.lexema)
 
                                         return Promedio(resultado, lexema.obtener_Fila(), lexema.obtener_Columna())
+                                    
+                elif lexema.operar(None) == "datos":
+                    lexema = self.lista_lexema.pop(0)
+                    if lexema.operar(None) == '(':
+                        parentesis = self.lista_lexema.pop(0)
+                        if parentesis.operar(None) == ')':
+                            punto_coma = self.lista_lexema.pop(0)
+                            if punto_coma.operar(None) == ';':
+
+                                return Datos(self.get_datos(), lexema.obtener_Fila(), lexema.obtener_Columna())
 
             else:
                 return "MALOOOO"
@@ -365,6 +380,22 @@ class analizador:
 
         return None
 
+    def get_datos(self):
+        datos = ''
+
+        for campos in self.claves:
+            # datos += "{:<14}".format(campos)
+            datos += campos+"     "
+
+        datos += "\n"
+
+        for registros in self.registros:
+            for i in range(0, len(self.claves)):
+                # datos += str(registros[i])+"     "
+                datos += "{:<14}".format(str(registros[i]))
+            datos += "\n"
+        
+        return datos
             
     def armar_claves(self):
         sig2 = ""
