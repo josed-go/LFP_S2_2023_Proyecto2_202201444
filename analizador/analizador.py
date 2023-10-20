@@ -6,6 +6,7 @@ from clases.imprimirln import *
 from clases.conteo import *
 from clases.promedio import *
 from clases.datos import *
+from clases.suma import *
 
 class analizador:
     def __init__(self):
@@ -304,6 +305,23 @@ class analizador:
                             if punto_coma.operar(None) == ';':
 
                                 return Datos(self.get_datos(), lexema.obtener_Fila(), lexema.obtener_Columna())
+                            
+                elif lexema.operar(None) == "sumar":
+                    lexema = self.lista_lexema.pop(0)
+                    if lexema.operar(None) == '(':
+                        comillas = self.lista_lexema.pop(0)
+                        if comillas.operar(None) == '"':
+                            campo = self.lista_lexema.pop(0)
+                            comillas = self.lista_lexema.pop(0)
+                            if comillas.operar(None) == '"':
+                                parentesis = self.lista_lexema.pop(0)
+                                if parentesis.operar(None) == ')':
+                                    punto_coma = self.lista_lexema.pop(0)
+                                    if punto_coma.operar(None) == ';':
+
+                                        resultado = self.sumar(campo.lexema)
+
+                                        return Suma(resultado, lexema.obtener_Fila(), lexema.obtener_Columna())
 
             else:
                 return "MALOOOO"
@@ -396,6 +414,21 @@ class analizador:
             datos += "\n"
         
         return datos
+    
+    def sumar(self, campo):
+        index = ''
+        suma = 0
+        if campo in self.claves:
+            index = self.claves.index(campo)
+
+            for i in range(0, len(self.registros)):
+                # if self.registros[i][index].isalpha():
+                #     return None
+                suma += self.registros[i][index]
+
+            return str(suma)
+
+        return None
             
     def armar_claves(self):
         sig2 = ""
