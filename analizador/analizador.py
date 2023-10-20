@@ -7,6 +7,7 @@ from clases.conteo import *
 from clases.promedio import *
 from clases.datos import *
 from clases.suma import *
+from clases.maxmin import *
 
 class analizador:
     def __init__(self):
@@ -322,6 +323,40 @@ class analizador:
                                         resultado = self.sumar(campo.lexema)
 
                                         return Suma(resultado, lexema.obtener_Fila(), lexema.obtener_Columna())
+                
+                elif lexema.operar(None) == "max":
+                    lexema = self.lista_lexema.pop(0)
+                    if lexema.operar(None) == '(':
+                        comillas = self.lista_lexema.pop(0)
+                        if comillas.operar(None) == '"':
+                            campo = self.lista_lexema.pop(0)
+                            comillas = self.lista_lexema.pop(0)
+                            if comillas.operar(None) == '"':
+                                parentesis = self.lista_lexema.pop(0)
+                                if parentesis.operar(None) == ')':
+                                    punto_coma = self.lista_lexema.pop(0)
+                                    if punto_coma.operar(None) == ';':
+
+                                        resultado = self.get_max(campo.lexema)
+
+                                        return MaxMin(resultado, lexema.obtener_Fila(), lexema.obtener_Columna())
+                                    
+                elif lexema.operar(None) == "min":
+                    lexema = self.lista_lexema.pop(0)
+                    if lexema.operar(None) == '(':
+                        comillas = self.lista_lexema.pop(0)
+                        if comillas.operar(None) == '"':
+                            campo = self.lista_lexema.pop(0)
+                            comillas = self.lista_lexema.pop(0)
+                            if comillas.operar(None) == '"':
+                                parentesis = self.lista_lexema.pop(0)
+                                if parentesis.operar(None) == ')':
+                                    punto_coma = self.lista_lexema.pop(0)
+                                    if punto_coma.operar(None) == ';':
+
+                                        resultado = self.get_min(campo.lexema)
+
+                                        return MaxMin(resultado, lexema.obtener_Fila(), lexema.obtener_Columna())
 
             else:
                 return "MALOOOO"
@@ -427,6 +462,36 @@ class analizador:
                 suma += self.registros[i][index]
 
             return str(suma)
+
+        return None
+    
+    def get_max(self, campo):
+        index = ''
+        lista_temp = []
+        if campo in self.claves:
+            index = self.claves.index(campo)
+
+            for registros in self.registros:
+                # if self.registros[i][index].isalpha():
+                #     return None
+                lista_temp.append(registros[index])
+
+            return str(max(lista_temp))
+
+        return None
+    
+    def get_min(self, campo):
+        index = ''
+        lista_temp = []
+        if campo in self.claves:
+            index = self.claves.index(campo)
+
+            for registros in self.registros:
+                # if self.registros[i][index].isalpha():
+                #     return None
+                lista_temp.append(registros[index])
+
+            return str(min(lista_temp))
 
         return None
             

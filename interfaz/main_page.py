@@ -8,6 +8,7 @@ from clases.conteo import *
 from clases.promedio import *
 from clases.datos import *
 from clases.suma import *
+from clases.maxmin import *
 
 from analizador.analizador import analizador
 
@@ -167,7 +168,7 @@ class main_page:
                     # if int(self.consola.index('end-1c').split('.')[0]) == 1:
                     #     self.consola.insert(tk.END, ">>>")
                     imprimir_consola += elemento.ejecutarT()+" "
-                elif isinstance(elemento, Imprimirln) or isinstance(elemento, Conteo) or isinstance(elemento, Promedio) or isinstance(elemento, Datos) or isinstance(elemento, Suma):
+                elif isinstance(elemento, Imprimirln) or isinstance(elemento, Conteo) or isinstance(elemento, Promedio) or isinstance(elemento, Datos) or isinstance(elemento, Suma) or isinstance(elemento, MaxMin):
                     # if int(self.consola.index('end-1c').split('.')[0]) == 1:
                     #     self.consola.insert(tk.END, ">>>")
                     imprimir_consola += "\n"+elemento.ejecutarT()+" "
