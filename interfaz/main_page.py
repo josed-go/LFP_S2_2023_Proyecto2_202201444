@@ -94,7 +94,7 @@ class main_page:
         self.reporte_tokens.grid(row=0, column=3, padx=5, pady=10)
         self.reporte_tokens['font'] = self.fuente
 
-        self.arbol_derivacion = tk.Button(self.menu_frame, text="Arbol de derivación", padx=5, height=1, bg="#fdf9c4", activebackground="#ffda9e")
+        self.arbol_derivacion = tk.Button(self.menu_frame, text="Arbol de derivación", padx=5, height=1, bg="#fdf9c4", activebackground="#ffda9e", command = self.reporte_arbol)
         self.arbol_derivacion.grid(row=0, column=4, padx=5, pady=10)
         self.arbol_derivacion['font'] = self.fuente
 
@@ -197,6 +197,10 @@ class main_page:
     def reporte_tokens(self):
         self.analizador.generar_reporte_tokens()
         messagebox.showinfo("Exito!", "El reporte se ha generado correctamente.")
+
+    def reporte_arbol(self):
+        self.analizador.arbol_derivacion()
+        messagebox.showinfo("Exito!", "El arbol se ha generado correctamente.")
 
     def nombre_archivo(self, nombre):
         name = os.path.basename(nombre)

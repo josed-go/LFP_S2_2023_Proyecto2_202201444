@@ -10,6 +10,7 @@ from clases.suma import *
 from clases.maxmin import *
 from clases.reporte import *
 from clases.contarsi import *
+import os
 
 class analizador:
     def __init__(self):
@@ -21,6 +22,7 @@ class analizador:
         self.lista_errores_lexicos = []
         self.lista_errores_sintacticos = []
         self.lista_tokens = []
+        self.lista_lexema_arbol = []
 
         self.claves = []
         self.registros = []
@@ -189,6 +191,7 @@ class analizador:
         #     print(error.lexema)
 
         self.lista_tokens = self.lista_lexema.copy()
+        self.lista_lexema_arbol = self.lista_lexema.copy()
 
         return self.lista_lexema
     
@@ -1046,6 +1049,48 @@ class analizador:
         
         file.write(html)
         file.close()
+
+    def arbol_derivacion(self):
+        cont = 1
+        sig = ''
+        dot = 'digraph G {n0[label="inicio"]\n'
+
+        while self.lista_lexema_arbol:
+            primero = self.lista_lexema_arbol.pop(0)
+            if primero.operar(None) in self.palabras:
+                cont_h = 1
+                dot += f'n{cont}[label="{primero.operar(None)}",style = filled, color="#fdf9c4"]\n'
+                dot += f'n0->n{cont}\n'
+                
+                sig = self.lista_lexema_arbol.pop(0)
+
+                if sig.operar(None) == '=':
+                    while sig.operar(None) != "]":
+                        if sig.operar(None) == "\"":
+                            dot += f'n{cont}h{cont_h}[label="\{sig.operar(None)}"]\n'
+                        else:
+                            dot += f'n{cont}h{cont_h}[label="{sig.operar(None)}"]\n'
+                        dot += f'n{cont}->n{cont}h{cont_h}\n'
+                        sig = self.lista_lexema_arbol.pop(0)
+                        cont_h += 1
+                elif sig.operar(None) == '(':
+                    while sig.operar(None) != ";":
+                        if sig.operar(None) == "\"":
+                            dot += f'n{cont}h{cont_h}[label="\{sig.operar(None)}"]\n'
+                        else:
+                            dot += f'n{cont}h{cont_h}[label="{sig.operar(None)}"]\n'
+                        dot += f'n{cont}->n{cont}h{cont_h}\n'
+                        sig = self.lista_lexema_arbol.pop(0)
+                        cont_h += 1
+                cont += 1
+        dot += "}"
+
+        f = open('bb.dot', 'w', encoding="utf-8")
+        f.write(dot)
+        f.close()
+        os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin'
+        os.system(f'dot -Tsvg bb.dot -o arbol_derivacion.svg')
+
 
     def limpiar_listas(self):
         self.lista_lexema.clear()
