@@ -17,7 +17,7 @@ class analizador:
 
         self.lista_lexema = []
         self.lista_instrucciones = []
-        self.lista_errores = []
+        self.lista_errores_lexicos = []
 
         self.claves = []
         self.registros = []
@@ -40,7 +40,6 @@ class analizador:
         self.palabras = list(self.palabra_reservadas.values())
 
     def analizador_lexico(self, cadena):
-        print(self.palabras)
         # print("aqui")
         lexema = ''
         puntero = 0
@@ -49,43 +48,36 @@ class analizador:
             char = cadena[puntero]
             puntero += 1
 
-            if char == '\n':
-                cadena = cadena[1:]
-                puntero = 0
-                self.numero_linea += 1
-                self.numero_columna = 1
-            elif char == '\t':
-                self.numero_linea += 1
-                self.numero_columna += 4
-                cadena = cadena[4:]
-                puntero = 0
-            elif char == '#':
+            
+            if char == '#':
                 lexema, cadena = self.comentario(cadena[puntero:])
                 if lexema and cadena :
                     self.numero_linea += 1
 
                     print("Comentario:", lexema)
-                    self.numero_columna = 1
+                    # self.numero_columna = 1
                     puntero = 0
             elif char == '\'':
                 lexema, cadena = self.comentario(cadena[puntero:])
                 if lexema and cadena :
-                    self.numero_columna = 1
+                    self.numero_linea += 1
+                    # self.numero_columna = 1
 
                     print("Comentario Multiple:", lexema)
-                    self.numero_columna += len(lexema)+1
+                    # self.numero_columna += len(lexema)+1
                     puntero = 0
             elif char.isalpha():
                 lexema, cadena = self.armar_lexema(cadena)
                 if lexema and cadena:
-                    # self.numero_columna += 1
 
 
                     lexm = Lexema(lexema, self.numero_linea, self.numero_columna)
                     self.lista_lexema.append(lexm)
-                    self.numero_columna += len(lexema) 
+                    if self.numero_columna == 1: self.numero_columna += 1
+                    self.numero_columna += len(str(lexema))
                     puntero = 0
             elif char == "[" or char == "]" or char == "{" or char == "}" or char == "(" or char == ")" or char == ";" or char == "\"" or char == "=" or char == ",":
+
                 c = Lexema(char, self.numero_linea, self.numero_columna)
                 self.numero_columna += 1
 
@@ -95,39 +87,48 @@ class analizador:
                 puntero = 0
             elif char.isdigit():
 
-                numero, cadena = self.numeros(cadena)
+                numero, cadena, num_len = self.numeros(cadena)
 
                 if numero and cadena:
-                    # self.numero_columna += 1
 
-                    num = Numero(numero, self.numero_linea, self.numero_linea)
+                    num = Numero(numero, self.numero_linea, self.numero_columna)
+                    if self.numero_columna == 1: self.numero_columna += 1
 
                     self.lista_lexema.append(num)
-                    self.numero_columna += len(str(numero)) + 1
+                    self.numero_columna += len(str(num_len))
                     puntero = 0
             elif char == ' ' or char == '\r':
                 cadena = cadena[1:]
                 self.numero_columna += 1
-                puntero = 0
-            elif char == '\t':
-                self.numero_columna += 4
-                cadena = cadena[4:]
                 puntero = 0
             elif char == '\n':
                 cadena = cadena[1:]
                 puntero = 0
                 self.numero_linea += 1
                 self.numero_columna = 1
+            elif char == '\t':
+                # self.numero_linea += 1
+                self.numero_columna += 4
+                cadena = cadena[4:]
+                puntero = 0
             else:
                 cadena = cadena[1:]
                 puntero = 0
-                self.numero_columna += 1
                 # print("Errro:1", char)
-                error = Errores((len(self.lista_errores)+1), char , "Error lexico", self.numero_linea, self.numero_columna)
-                self.lista_errores.append(error)
+                error = Errores((len(self.lista_errores_lexicos)+1), char , "Error lexico", self.numero_linea, self.numero_columna)
+                self.numero_columna += 1
+                self.lista_errores_lexicos.append(error)
 
-        for lexema in self.lista_lexema:
-            print(lexema.lexema)
+        # for lexema in self.lista_lexema:
+        #     print(lexema.lexema)
+
+        print("------------")
+        for error in self.lista_errores_lexicos:
+            print("Error Lexico:",error.lexema,"fila:",error.obtener_Fila(),"columna:",error.obtener_Columna())
+        print("------------")
+        print("Lexemas:")
+        for lex_todos in self.lista_lexema:
+            print("Lexema:",lex_todos.lexema,"fila:",lex_todos.obtener_Fila(),"columna:",lex_todos.obtener_Columna())
         # for lexema in self.lista_lexema:
         #     print("{}-lin-{} -col-{}".format(lexema.lexema, lexema.obtener_Fila(), lexema.obtener_Columna()))
         # print("ERRORES")
@@ -159,9 +160,11 @@ class analizador:
                 es_decimal = True
             if char == '\"' or char == ' ' or char == '\n' or char == '\t' or char == ',' or char == '}' or char == ')':
                 if es_decimal:
-                    return float(numero), cadena[len(puntero)-1:]
+                    print("Numeo:",numero)
+                    return float(numero), cadena[len(puntero)-1:], str(numero)
                 else:
-                    return int(numero), cadena[len(puntero)-1:]
+                    print("Numeo:",numero)
+                    return int(numero), cadena[len(puntero)-1:], str(numero)
             else:
                 numero += char
         return None, None
@@ -178,7 +181,7 @@ class analizador:
                 for char in cadena:
                     puntero += char
                     if cont == 3:
-                        # self.numero_linea += 1
+                        self.numero_linea += 1
                         return lexema, cadena[len(puntero)+1:]
                     
                     if char == '\'':
@@ -194,6 +197,7 @@ class analizador:
                 puntero += char
                 if char == '\n':
                     self.numero_linea += 1
+                    self.numero_columna = 1
                     return lexema, cadena[len(puntero)+1:]
                 else :
                     lexema += char
