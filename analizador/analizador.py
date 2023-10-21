@@ -18,6 +18,7 @@ class analizador:
         self.lista_lexema = []
         self.lista_instrucciones = []
         self.lista_errores_lexicos = []
+        self.lista_errores_sintacticos = []
 
         self.claves = []
         self.registros = []
@@ -160,10 +161,8 @@ class analizador:
                 es_decimal = True
             if char == '\"' or char == ' ' or char == '\n' or char == '\t' or char == ',' or char == '}' or char == ')':
                 if es_decimal:
-                    print("Numeo:",numero)
                     return float(numero), cadena[len(puntero)-1:], str(numero)
                 else:
-                    print("Numeo:",numero)
                     return int(numero), cadena[len(puntero)-1:], str(numero)
             else:
                 numero += char
@@ -215,173 +214,316 @@ class analizador:
         comilla = ''
 
         while self.lista_lexema:
-            lexema = self.lista_lexema.pop(0)
-            if lexema.operar(None) in self.palabras:
-                if lexema.operar(None) == "Claves":
-                    sig = self.lista_lexema.pop(0)
-
-                    if sig.operar(None) == "=":
+            
+            if len(self.lista_errores_sintacticos) == 0:
+                lexema = self.lista_lexema.pop(0)
+                if lexema.operar(None) in self.palabras:
+                    if lexema.operar(None) == "Claves":
                         sig = self.lista_lexema.pop(0)
 
-                        if sig.operar(None) == "[":
+                        if sig.operar(None) == "=":
+                            sig = self.lista_lexema.pop(0)
 
-                            self.armar_claves()
+                            if sig.operar(None) == "[":
+
+                                self.armar_claves()
+                            else:
+                                error = Errores((len(self.lista_errores_sintacticos)+1), sig.operar(None), "Error sintactico", sig.obtener_Fila(), sig.obtener_Columna())
+                                self.lista_errores_sintacticos.append(error)
+                                return print("ERROR")
+                            
                         else:
+                            error = Errores((len(self.lista_errores_sintacticos)+1), sig.operar(None), "Error sintactico", sig.obtener_Fila(), sig.obtener_Columna())
+                            self.lista_errores_sintacticos.append(error)
                             return print("ERROR")
-                        
-                    else:
-                        return print("ERROR")
-                    print(self.claves)
+                        print(self.claves)
 
+                    elif lexema.operar(None) == "Registros":
+                        sig_igual = self.lista_lexema.pop(0)
+
+                        if sig_igual.operar(None) == "=":
+                            corchete_in = self.lista_lexema.pop(0)
+
+                            if corchete_in.operar(None) == "[":
+
+                                self.armar_registros()
+                            else :
+                                error = Errores((len(self.lista_errores_sintacticos)+1), corchete_in.operar(None), "Error sintactico", corchete_in.obtener_Fila(), corchete_in.obtener_Columna())
+                                self.lista_errores_sintacticos.append(error)
+                        else :
+                            error = Errores((len(self.lista_errores_sintacticos)+1), sig_igual.operar(None), "Error sintactico", sig_igual.obtener_Fila(), sig_igual.obtener_Columna())
+                            self.lista_errores_sintacticos.append(error)
+
+                        print(self.registros)
+                        self.get_datos()
+                    elif lexema.operar(None) == "imprimir":
+                        lexema = self.lista_lexema.pop(0)
+                        if lexema.operar(None) == '(':
+                            comillas = self.lista_lexema.pop(0)
+                            if comillas.operar(None) == '"':
+                                texto = self.lista_lexema.pop(0)
+                                comillas = self.lista_lexema.pop(0)
+                                if comillas.operar(None) == '"':
+                                    parentesis = self.lista_lexema.pop(0)
+                                    if parentesis.operar(None) == ')':
+                                        punto_coma = self.lista_lexema.pop(0)
+                                        if punto_coma.operar(None) == ';':
+                                            return Imprimir(texto.lexema, lexema.obtener_Fila(), lexema.obtener_Columna())
+                                        else:
+                                            error = Errores((len(self.lista_errores_sintacticos)+1), punto_coma.operar(None), "Error sintactico", punto_coma.obtener_Fila(), punto_coma.obtener_Columna())
+                                            self.lista_errores_sintacticos.append(error)
+                                    else:
+                                        error = Errores((len(self.lista_errores_sintacticos)+1), parentesis.operar(None), "Error sintactico", parentesis.obtener_Fila(), parentesis.obtener_Columna())
+                                        self.lista_errores_sintacticos.append(error)
+                                else:
+                                    error = Errores((len(self.lista_errores_sintacticos)+1), comillas.operar(None), "Error sintactico", comillas.obtener_Fila(), comillas.obtener_Columna())
+                                    self.lista_errores_sintacticos.append(error)
+                            else:
+                                error = Errores((len(self.lista_errores_sintacticos)+1), comillas.operar(None), "Error sintactico", comillas.obtener_Fila(), comillas.obtener_Columna())
+                                self.lista_errores_sintacticos.append(error)
+                        else :
+                            error = Errores((len(self.lista_errores_sintacticos)+1), lexema.operar(None), "Error sintactico", lexema.obtener_Fila(), lexema.obtener_Columna())
+                            self.lista_errores_sintacticos.append(error)
+
+                    elif lexema.operar(None) == "imprimirln":
+                        lexema = self.lista_lexema.pop(0)
+                        if lexema.operar(None) == '(':
+                            comillas = self.lista_lexema.pop(0)
+                            if comillas.operar(None) == '"':
+                                texto = self.lista_lexema.pop(0)
+                                comillas = self.lista_lexema.pop(0)
+                                if comillas.operar(None) == '"':
+                                    parentesis = self.lista_lexema.pop(0)
+                                    if parentesis.operar(None) == ')':
+                                        punto_coma = self.lista_lexema.pop(0)
+                                        if punto_coma.operar(None) == ';':
+                                            return Imprimirln(texto.lexema, lexema.obtener_Fila(), lexema.obtener_Columna())
+                                        else:
+                                            error = Errores((len(self.lista_errores_sintacticos)+1), punto_coma.operar(None), "Error sintactico", punto_coma.obtener_Fila(), punto_coma.obtener_Columna())
+                                            self.lista_errores_sintacticos.append(error)
+                                    else:
+                                        error = Errores((len(self.lista_errores_sintacticos)+1), parentesis.operar(None), "Error sintactico", parentesis.obtener_Fila(), parentesis.obtener_Columna())
+                                        self.lista_errores_sintacticos.append(error)
+                                else:
+                                    error = Errores((len(self.lista_errores_sintacticos)+1), comillas.operar(None), "Error sintactico", comillas.obtener_Fila(), comillas.obtener_Columna())
+                                    self.lista_errores_sintacticos.append(error)
+                            else:
+                                error = Errores((len(self.lista_errores_sintacticos)+1), comillas.operar(None), "Error sintactico", comillas.obtener_Fila(), comillas.obtener_Columna())
+                                self.lista_errores_sintacticos.append(error)
+                        else :
+                            error = Errores((len(self.lista_errores_sintacticos)+1), lexema.operar(None), "Error sintactico", lexema.obtener_Fila(), lexema.obtener_Columna())
+                            self.lista_errores_sintacticos.append(error)
+
+                    elif lexema.operar(None) == "conteo":
+                        lexema = self.lista_lexema.pop(0)
+                        if lexema.operar(None) == '(':
+                            parentesis = self.lista_lexema.pop(0)
+                            if parentesis.operar(None) == ')':
+                                punto_coma = self.lista_lexema.pop(0)
+                                if punto_coma.operar(None) == ';':
+                                    return Conteo(self.get_conteo(), lexema.obtener_Fila(), lexema.obtener_Columna())
+                                else:
+                                    error = Errores((len(self.lista_errores_sintacticos)+1), punto_coma.operar(None), "Error sintactico", punto_coma.obtener_Fila(), punto_coma.obtener_Columna())
+                                    self.lista_errores_sintacticos.append(error)
+                            else:
+                                error = Errores((len(self.lista_errores_sintacticos)+1), parentesis.operar(None), "Error sintactico", parentesis.obtener_Fila(), parentesis.obtener_Columna())
+                                self.lista_errores_sintacticos.append(error)
+                        else:
+                            error = Errores((len(self.lista_errores_sintacticos)+1), lexema.operar(None), "Error sintactico", lexema.obtener_Fila(), lexema.obtener_Columna())
+                            self.lista_errores_sintacticos.append(error)
+                                
+                    elif lexema.operar(None) == "promedio":
+                        lexema = self.lista_lexema.pop(0)
+                        if lexema.operar(None) == '(':
+                            comillas = self.lista_lexema.pop(0)
+                            if comillas.operar(None) == '"':
+                                campo = self.lista_lexema.pop(0)
+                                comillas = self.lista_lexema.pop(0)
+                                if comillas.operar(None) == '"':
+                                    parentesis = self.lista_lexema.pop(0)
+                                    if parentesis.operar(None) == ')':
+                                        punto_coma = self.lista_lexema.pop(0)
+                                        if punto_coma.operar(None) == ';':
+
+                                            resultado = self.promedio(campo.lexema)
+
+                                            return Promedio(resultado, lexema.obtener_Fila(), lexema.obtener_Columna())
+                                        else:
+                                            error = Errores((len(self.lista_errores_sintacticos)+1), punto_coma.operar(None), "Error sintactico", punto_coma.obtener_Fila(), punto_coma.obtener_Columna())
+                                            self.lista_errores_sintacticos.append(error)
+                                    else:
+                                        error = Errores((len(self.lista_errores_sintacticos)+1), parentesis.operar(None), "Error sintactico", parentesis.obtener_Fila(), parentesis.obtener_Columna())
+                                        self.lista_errores_sintacticos.append(error)
+                                else:
+                                    error = Errores((len(self.lista_errores_sintacticos)+1), comillas.operar(None), "Error sintactico", comillas.obtener_Fila(), comillas.obtener_Columna())
+                                    self.lista_errores_sintacticos.append(error)
+                            else:
+                                error = Errores((len(self.lista_errores_sintacticos)+1), comillas.operar(None), "Error sintactico", comillas.obtener_Fila(), comillas.obtener_Columna())
+                                self.lista_errores_sintacticos.append(error)
+                        else :
+                            error = Errores((len(self.lista_errores_sintacticos)+1), lexema.operar(None), "Error sintactico", lexema.obtener_Fila(), lexema.obtener_Columna())
+                            self.lista_errores_sintacticos.append(error)
+
+                    elif lexema.operar(None) == "datos":
+                        lexema = self.lista_lexema.pop(0)
+                        if lexema.operar(None) == '(':
+                            parentesis = self.lista_lexema.pop(0)
+                            if parentesis.operar(None) == ')':
+                                punto_coma = self.lista_lexema.pop(0)
+                                if punto_coma.operar(None) == ';':
+
+                                    return Datos(self.get_datos(), lexema.obtener_Fila(), lexema.obtener_Columna())
+                                else:
+                                    error = Errores((len(self.lista_errores_sintacticos)+1), punto_coma.operar(None), "Error sintactico", punto_coma.obtener_Fila(), punto_coma.obtener_Columna())
+                                    self.lista_errores_sintacticos.append(error)
+                            else:
+                                error = Errores((len(self.lista_errores_sintacticos)+1), parentesis.operar(None), "Error sintactico", parentesis.obtener_Fila(), parentesis.obtener_Columna())
+                                self.lista_errores_sintacticos.append(error)
+                        else:
+                            error = Errores((len(self.lista_errores_sintacticos)+1), lexema.operar(None), "Error sintactico", lexema.obtener_Fila(), lexema.obtener_Columna())
+                            self.lista_errores_sintacticos.append(error)
+                                
+                    elif lexema.operar(None) == "sumar":
+                        lexema = self.lista_lexema.pop(0)
+                        if lexema.operar(None) == '(':
+                            comillas = self.lista_lexema.pop(0)
+                            if comillas.operar(None) == '"':
+                                campo = self.lista_lexema.pop(0)
+                                comillas = self.lista_lexema.pop(0)
+                                if comillas.operar(None) == '"':
+                                    parentesis = self.lista_lexema.pop(0)
+                                    if parentesis.operar(None) == ')':
+                                        punto_coma = self.lista_lexema.pop(0)
+                                        if punto_coma.operar(None) == ';':
+
+                                            resultado = self.sumar(campo.lexema)
+
+                                            return Suma(resultado, lexema.obtener_Fila(), lexema.obtener_Columna())
+                                        else:
+                                            error = Errores((len(self.lista_errores_sintacticos)+1), punto_coma.operar(None), "Error sintactico", punto_coma.obtener_Fila(), punto_coma.obtener_Columna())
+                                            self.lista_errores_sintacticos.append(error)
+                                    else:
+                                        error = Errores((len(self.lista_errores_sintacticos)+1), parentesis.operar(None), "Error sintactico", parentesis.obtener_Fila(), parentesis.obtener_Columna())
+                                        self.lista_errores_sintacticos.append(error)
+                                else:
+                                    error = Errores((len(self.lista_errores_sintacticos)+1), comillas.operar(None), "Error sintactico", comillas.obtener_Fila(), comillas.obtener_Columna())
+                                    self.lista_errores_sintacticos.append(error)
+                            else:
+                                error = Errores((len(self.lista_errores_sintacticos)+1), comillas.operar(None), "Error sintactico", comillas.obtener_Fila(), comillas.obtener_Columna())
+                                self.lista_errores_sintacticos.append(error)
+                        else :
+                            error = Errores((len(self.lista_errores_sintacticos)+1), lexema.operar(None), "Error sintactico", lexema.obtener_Fila(), lexema.obtener_Columna())
+                            self.lista_errores_sintacticos.append(error)
                     
+                    elif lexema.operar(None) == "max":
+                        lexema = self.lista_lexema.pop(0)
+                        if lexema.operar(None) == '(':
+                            comillas = self.lista_lexema.pop(0)
+                            if comillas.operar(None) == '"':
+                                campo = self.lista_lexema.pop(0)
+                                comillas = self.lista_lexema.pop(0)
+                                if comillas.operar(None) == '"':
+                                    parentesis = self.lista_lexema.pop(0)
+                                    if parentesis.operar(None) == ')':
+                                        punto_coma = self.lista_lexema.pop(0)
+                                        if punto_coma.operar(None) == ';':
+
+                                            resultado = self.get_max(campo.lexema)
+
+                                            return MaxMin(resultado, lexema.obtener_Fila(), lexema.obtener_Columna())
+                                        else:
+                                            error = Errores((len(self.lista_errores_sintacticos)+1), punto_coma.operar(None), "Error sintactico", punto_coma.obtener_Fila(), punto_coma.obtener_Columna())
+                                            self.lista_errores_sintacticos.append(error)
+                                    else:
+                                        error = Errores((len(self.lista_errores_sintacticos)+1), parentesis.operar(None), "Error sintactico", parentesis.obtener_Fila(), parentesis.obtener_Columna())
+                                        self.lista_errores_sintacticos.append(error)
+                                else:
+                                    error = Errores((len(self.lista_errores_sintacticos)+1), comillas.operar(None), "Error sintactico", comillas.obtener_Fila(), comillas.obtener_Columna())
+                                    self.lista_errores_sintacticos.append(error)
+                            else:
+                                error = Errores((len(self.lista_errores_sintacticos)+1), comillas.operar(None), "Error sintactico", comillas.obtener_Fila(), comillas.obtener_Columna())
+                                self.lista_errores_sintacticos.append(error)
+                        else :
+                            error = Errores((len(self.lista_errores_sintacticos)+1), lexema.operar(None), "Error sintactico", lexema.obtener_Fila(), lexema.obtener_Columna())
+                            self.lista_errores_sintacticos.append(error)
+                                        
+                    elif lexema.operar(None) == "min":
+                        lexema = self.lista_lexema.pop(0)
+                        if lexema.operar(None) == '(':
+                            comillas = self.lista_lexema.pop(0)
+                            if comillas.operar(None) == '"':
+                                campo = self.lista_lexema.pop(0)
+                                comillas = self.lista_lexema.pop(0)
+                                if comillas.operar(None) == '"':
+                                    parentesis = self.lista_lexema.pop(0)
+                                    if parentesis.operar(None) == ')':
+                                        punto_coma = self.lista_lexema.pop(0)
+                                        if punto_coma.operar(None) == ';':
+
+                                            resultado = self.get_min(campo.lexema)
+
+                                            return MaxMin(resultado, lexema.obtener_Fila(), lexema.obtener_Columna())
+                                        else:
+                                            error = Errores((len(self.lista_errores_sintacticos)+1), punto_coma.operar(None), "Error sintactico", punto_coma.obtener_Fila(), punto_coma.obtener_Columna())
+                                            self.lista_errores_sintacticos.append(error)
+                                    else:
+                                        error = Errores((len(self.lista_errores_sintacticos)+1), parentesis.operar(None), "Error sintactico", parentesis.obtener_Fila(), parentesis.obtener_Columna())
+                                        self.lista_errores_sintacticos.append(error)
+                                else:
+                                    error = Errores((len(self.lista_errores_sintacticos)+1), comillas.operar(None), "Error sintactico", comillas.obtener_Fila(), comillas.obtener_Columna())
+                                    self.lista_errores_sintacticos.append(error)
+                            else:
+                                error = Errores((len(self.lista_errores_sintacticos)+1), comillas.operar(None), "Error sintactico", comillas.obtener_Fila(), comillas.obtener_Columna())
+                                self.lista_errores_sintacticos.append(error)
+                        else :
+                            error = Errores((len(self.lista_errores_sintacticos)+1), lexema.operar(None), "Error sintactico", lexema.obtener_Fila(), lexema.obtener_Columna())
+                            self.lista_errores_sintacticos.append(error)
                     
-                elif lexema.operar(None) == "Registros":
-                    sig_igual = self.lista_lexema.pop(0)
-
-                    if sig_igual.operar(None) == "=":
-                        corchete_in = self.lista_lexema.pop(0)
-
-                        if corchete_in.operar(None) == "[":
-
-                            self.armar_registros()
-
-                    print(self.registros)
-                    self.get_datos()
-                elif lexema.operar(None) == "imprimir":
-                    lexema = self.lista_lexema.pop(0)
-                    if lexema.operar(None) == '(':
-                        comillas = self.lista_lexema.pop(0)
-                        if comillas.operar(None) == '"':
-                            texto = self.lista_lexema.pop(0)
+                    elif lexema.operar(None) == "exportarReporte":
+                        lexema = self.lista_lexema.pop(0)
+                        if lexema.operar(None) == '(':
                             comillas = self.lista_lexema.pop(0)
                             if comillas.operar(None) == '"':
-                                parentesis = self.lista_lexema.pop(0)
-                                if parentesis.operar(None) == ')':
-                                    punto_coma = self.lista_lexema.pop(0)
-                                    if punto_coma.operar(None) == ';':
-                                        return Imprimir(texto.lexema, lexema.obtener_Fila(), lexema.obtener_Columna())
-                                    
-                elif lexema.operar(None) == "imprimirln":
-                    lexema = self.lista_lexema.pop(0)
-                    if lexema.operar(None) == '(':
-                        comillas = self.lista_lexema.pop(0)
-                        if comillas.operar(None) == '"':
-                            texto = self.lista_lexema.pop(0)
-                            comillas = self.lista_lexema.pop(0)
-                            if comillas.operar(None) == '"':
-                                parentesis = self.lista_lexema.pop(0)
-                                if parentesis.operar(None) == ')':
-                                    punto_coma = self.lista_lexema.pop(0)
-                                    if punto_coma.operar(None) == ';':
-                                        return Imprimirln(texto.lexema, lexema.obtener_Fila(), lexema.obtener_Columna())
-                                    
-                elif lexema.operar(None) == "conteo":
-                    lexema = self.lista_lexema.pop(0)
-                    if lexema.operar(None) == '(':
-                        parentesis = self.lista_lexema.pop(0)
-                        if parentesis.operar(None) == ')':
-                            punto_coma = self.lista_lexema.pop(0)
-                            if punto_coma.operar(None) == ';':
+                                titulo = self.lista_lexema.pop(0)
+                                comillas = self.lista_lexema.pop(0)
+                                if comillas.operar(None) == '"':
+                                    parentesis = self.lista_lexema.pop(0)
+                                    if parentesis.operar(None) == ')':
+                                        punto_coma = self.lista_lexema.pop(0)
+                                        if punto_coma.operar(None) == ';':
 
-                                return Conteo(self.get_conteo(), lexema.obtener_Fila(), lexema.obtener_Columna())
-                            
-                elif lexema.operar(None) == "promedio":
-                    lexema = self.lista_lexema.pop(0)
-                    if lexema.operar(None) == '(':
-                        comillas = self.lista_lexema.pop(0)
-                        if comillas.operar(None) == '"':
-                            campo = self.lista_lexema.pop(0)
-                            comillas = self.lista_lexema.pop(0)
-                            if comillas.operar(None) == '"':
-                                parentesis = self.lista_lexema.pop(0)
-                                if parentesis.operar(None) == ')':
-                                    punto_coma = self.lista_lexema.pop(0)
-                                    if punto_coma.operar(None) == ';':
+                                            self.generar_reporte(titulo.lexema)
 
-                                        resultado = self.promedio(campo.lexema)
+                                            return Reporte(titulo.lexema, lexema.obtener_Fila(), lexema.obtener_Columna())
+                                        else:
+                                            error = Errores((len(self.lista_errores_sintacticos)+1), punto_coma.operar(None), "Error sintactico", punto_coma.obtener_Fila(), punto_coma.obtener_Columna())
+                                            self.lista_errores_sintacticos.append(error)
+                                    else:
+                                        error = Errores((len(self.lista_errores_sintacticos)+1), parentesis.operar(None), "Error sintactico", parentesis.obtener_Fila(), parentesis.obtener_Columna())
+                                        self.lista_errores_sintacticos.append(error)
+                                else:
+                                    error = Errores((len(self.lista_errores_sintacticos)+1), comillas.operar(None), "Error sintactico", comillas.obtener_Fila(), comillas.obtener_Columna())
+                                    self.lista_errores_sintacticos.append(error)
+                            else:
+                                error = Errores((len(self.lista_errores_sintacticos)+1), comillas.operar(None), "Error sintactico", comillas.obtener_Fila(), comillas.obtener_Columna())
+                                self.lista_errores_sintacticos.append(error)
+                        else :
+                            error = Errores((len(self.lista_errores_sintacticos)+1), lexema.operar(None), "Error sintactico", lexema.obtener_Fila(), lexema.obtener_Columna())
+                            self.lista_errores_sintacticos.append(error)
+                    else :
+                        error = Errores((len(self.lista_errores_sintacticos)+1), lexema.operar(None), "Error sintactico", lexema.obtener_Fila(), lexema.obtener_Columna())
+                        self.lista_errores_sintacticos.append(error)
+                else:
+                    error = Errores((len(self.lista_errores_sintacticos)+1), lexema.operar(None), "Error sintactico", lexema.obtener_Fila(), lexema.obtener_Columna())
+                    self.lista_errores_sintacticos.append(error)
 
-                                        return Promedio(resultado, lexema.obtener_Fila(), lexema.obtener_Columna())
-                                    
-                elif lexema.operar(None) == "datos":
-                    lexema = self.lista_lexema.pop(0)
-                    if lexema.operar(None) == '(':
-                        parentesis = self.lista_lexema.pop(0)
-                        if parentesis.operar(None) == ')':
-                            punto_coma = self.lista_lexema.pop(0)
-                            if punto_coma.operar(None) == ';':
+                    return "MALOOOO"
+            else :
 
-                                return Datos(self.get_datos(), lexema.obtener_Fila(), lexema.obtener_Columna())
-                            
-                elif lexema.operar(None) == "sumar":
-                    lexema = self.lista_lexema.pop(0)
-                    if lexema.operar(None) == '(':
-                        comillas = self.lista_lexema.pop(0)
-                        if comillas.operar(None) == '"':
-                            campo = self.lista_lexema.pop(0)
-                            comillas = self.lista_lexema.pop(0)
-                            if comillas.operar(None) == '"':
-                                parentesis = self.lista_lexema.pop(0)
-                                if parentesis.operar(None) == ')':
-                                    punto_coma = self.lista_lexema.pop(0)
-                                    if punto_coma.operar(None) == ';':
+                for er in self.lista_errores_sintacticos:
+                    print("ERROr", er.lexema)
+                return None
 
-                                        resultado = self.sumar(campo.lexema)
-
-                                        return Suma(resultado, lexema.obtener_Fila(), lexema.obtener_Columna())
-                
-                elif lexema.operar(None) == "max":
-                    lexema = self.lista_lexema.pop(0)
-                    if lexema.operar(None) == '(':
-                        comillas = self.lista_lexema.pop(0)
-                        if comillas.operar(None) == '"':
-                            campo = self.lista_lexema.pop(0)
-                            comillas = self.lista_lexema.pop(0)
-                            if comillas.operar(None) == '"':
-                                parentesis = self.lista_lexema.pop(0)
-                                if parentesis.operar(None) == ')':
-                                    punto_coma = self.lista_lexema.pop(0)
-                                    if punto_coma.operar(None) == ';':
-
-                                        resultado = self.get_max(campo.lexema)
-
-                                        return MaxMin(resultado, lexema.obtener_Fila(), lexema.obtener_Columna())
-                                    
-                elif lexema.operar(None) == "min":
-                    lexema = self.lista_lexema.pop(0)
-                    if lexema.operar(None) == '(':
-                        comillas = self.lista_lexema.pop(0)
-                        if comillas.operar(None) == '"':
-                            campo = self.lista_lexema.pop(0)
-                            comillas = self.lista_lexema.pop(0)
-                            if comillas.operar(None) == '"':
-                                parentesis = self.lista_lexema.pop(0)
-                                if parentesis.operar(None) == ')':
-                                    punto_coma = self.lista_lexema.pop(0)
-                                    if punto_coma.operar(None) == ';':
-
-                                        resultado = self.get_min(campo.lexema)
-
-                                        return MaxMin(resultado, lexema.obtener_Fila(), lexema.obtener_Columna())
-                
-                elif lexema.operar(None) == "exportarReporte":
-                    lexema = self.lista_lexema.pop(0)
-                    if lexema.operar(None) == '(':
-                        comillas = self.lista_lexema.pop(0)
-                        if comillas.operar(None) == '"':
-                            titulo = self.lista_lexema.pop(0)
-                            comillas = self.lista_lexema.pop(0)
-                            if comillas.operar(None) == '"':
-                                parentesis = self.lista_lexema.pop(0)
-                                if parentesis.operar(None) == ')':
-                                    punto_coma = self.lista_lexema.pop(0)
-                                    if punto_coma.operar(None) == ';':
-
-                                        self.generar_reporte(titulo.lexema)
-
-                                        return Reporte(titulo.lexema, lexema.obtener_Fila(), lexema.obtener_Columna())
-
-            else:
-                return "MALOOOO"
         return None
             
     def recursivo_operar(self):
@@ -426,13 +568,17 @@ class analizador:
                         sig = self.lista_lexema.pop(0)
                         continue
                     else:
-
+                        # error = Errores((len(self.lista_errores_sintacticos)+1), sig.operar(None), "Error sintactico", sig.obtener_Fila(), sig.obtener_Columna())
+                        # self.lista_errores_sintacticos.append(error)
                         lista_temp.append(sig.operar(None))
 
                     sig = self.lista_lexema.pop(0)
 
                 self.registros.append(lista_temp)
                 lista_temp = []
+            else:
+                error = Errores((len(self.lista_errores_sintacticos)+1), llave_in.operar(None), "Error sintactico", llave_in.obtener_Fila(), llave_in.obtener_Columna())
+                self.lista_errores_sintacticos.append(error)
 
             llave_cierre = self.lista_lexema.pop(0).operar(None)    
 
@@ -597,6 +743,8 @@ class analizador:
                 sig2 = self.lista_lexema.pop(0)
 
             else:
+                error = Errores((len(self.lista_errores_sintacticos)+1), sig.operar(None), "Error sintactico", sig.obtener_Fila(), sig.obtener_Columna())
+                self.lista_errores_sintacticos.append(error)
                 return print("ERRROE1")
             
             if sig2.operar(None) == ",":
@@ -605,7 +753,11 @@ class analizador:
             elif sig2.operar(None) == "]":
                 pass
             else:
+                error = Errores((len(self.lista_errores_sintacticos)+1), sig2.operar(None), "Error sintactico", sig2.obtener_Fila(), sig2.obtener_Columna())
+                self.lista_errores_sintacticos.append(error)
                 return print("ERRROE2")
 
         else:
+            error = Errores((len(self.lista_errores_sintacticos)+1), prueba.operar(None), "Error sintactico", prueba.obtener_Fila(), prueba.obtener_Columna())
+            self.lista_errores_sintacticos.append(error)
             return print("ERROR")
