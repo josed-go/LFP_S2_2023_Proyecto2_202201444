@@ -142,7 +142,7 @@ class analizador:
 
                 numero, cadena, num_len = self.numeros(cadena)
 
-                if numero and cadena:
+                if numero > -1 and cadena:
 
                     num = Numero(numero, 'NUMERO', self.numero_linea, self.numero_columna)
                     if self.numero_columna == 1: self.numero_columna += 1
@@ -215,6 +215,9 @@ class analizador:
                     comillas += 1
                 elif char == '\n':
                     no_enters +=1
+                    comillas = 0
+                else:
+                    comillas = 0
             else:
                 return cadena[(puntero+1):], no_enters
         return None, None
@@ -738,7 +741,7 @@ class analizador:
         for registros in self.registros:
             if str(registros[index]) == str(valor):
                 cont += 1
-
+        
         return str(cont)
 
     def generar_reporte(self, titulo):
