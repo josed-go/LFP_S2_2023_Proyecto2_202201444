@@ -586,7 +586,6 @@ class analizador:
         return str(len(self.registros))
     
     def generar_reporte(self, titulo):
-        print(titulo)
         campos_data = ''
         registros_data = ''
         longitud = len(self.claves)
@@ -761,3 +760,72 @@ class analizador:
             error = Errores((len(self.lista_errores_sintacticos)+1), prueba.operar(None), "Error sintactico", prueba.obtener_Fila(), prueba.obtener_Columna())
             self.lista_errores_sintacticos.append(error)
             return print("ERROR")
+        
+    def generar_reporte_errores(self):
+        errores_lexicos = ''
+        errores_sintacticos = ''
+        file = open("reporte_errores.html", 'w')
+
+        for lex in self.lista_errores_lexicos:
+            errores_lexicos += f"<tr><th>{lex.lexema}</th><th>{lex.obtener_Fila()}</th><th>{lex.obtener_Columna()}</th>\n</tr>"
+
+        for lex in self.lista_errores_sintacticos:
+            errores_sintacticos += f"<tr><th>{lex.lexema}</th><th>{lex.obtener_Fila()}</th><th>{lex.obtener_Columna()}</th>\n</tr>"
+
+        html = f"""<!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Errores</title>
+            </head>
+            <style>
+                body {{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: xx-large;
+                    padding-top: 150px;
+                }}
+                table {{
+                    border-collapse: collapse;
+                    border: 1px solid #000;
+                    padding: 15px;
+                }}
+                tr, th {{
+                    padding: 15px;
+                    border: 1px solid #000;
+                }}
+                .title {{
+                    background-color: #fdf9c4;
+                }}
+            </style>
+            <body>
+
+                <table>
+                    <tr class="title">
+                        <th colspan="3">Errores léxicos</th>
+                    </tr>
+                    <tr>
+                        <th>Token</th>
+                        <th>Fila</th>
+                        <th>Columna</th>
+                    </tr>
+                    {errores_lexicos}
+                    <tr class="title">
+                        <th colspan="3">Errores sintácticos</th>
+                    </tr>
+                    <tr>
+                        <th>Token</th>
+                        <th>Fila</th>
+                        <th>Columna</th>
+                    </tr>
+                    {errores_sintacticos}
+                </table>
+                
+            </body>
+            </html>"""
+
+        file.write(html)
+
+        file.close()

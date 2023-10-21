@@ -83,7 +83,7 @@ class main_page:
         self.analizar_B.grid(row=0, column=1, padx=5, pady=10)
         self.analizar_B['font'] = self.fuente
 
-        self.reporte_errores = tk.Button(self.menu_frame, text="Reporte de errores", padx=5, height=1, bg="#fdf9c4", activebackground="#ffda9e")
+        self.reporte_errores = tk.Button(self.menu_frame, text="Reporte de errores", padx=5, height=1, bg="#fdf9c4", activebackground="#ffda9e", command = self.reporte_errores)
         self.reporte_errores.grid(row=0, column=2, padx=5, pady=10)
         self.reporte_errores['font'] = self.fuente
 
@@ -185,6 +185,9 @@ class main_page:
             # self.consola.insert(tk.END, imprimir_consola)
             self.consola.config(state='disabled')
             messagebox.showinfo("Análisis exitoso", "El código se analizó exitosamente.")
+        
+    def reporte_errores(self):
+        self.analizador.generar_reporte_errores()
 
     def nombre_archivo(self, nombre):
         name = os.path.basename(nombre)
