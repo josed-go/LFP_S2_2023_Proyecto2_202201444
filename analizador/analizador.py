@@ -9,6 +9,7 @@ from clases.datos import *
 from clases.suma import *
 from clases.maxmin import *
 from clases.reporte import *
+from clases.contarsi import *
 
 class analizador:
     def __init__(self):
@@ -545,6 +546,70 @@ class analizador:
                         else :
                             error = Errores((len(self.lista_errores_sintacticos)+1), lexema.operar(None), "Error sintactico", lexema.obtener_Fila(), lexema.obtener_Columna())
                             self.lista_errores_sintacticos.append(error)
+
+                    elif lexema.operar(None) == "contarsi":
+
+                        lexema = self.lista_lexema.pop(0)
+                        if lexema.operar(None) == '(':
+                            comillas = self.lista_lexema.pop(0)
+                            if comillas.operar(None) == '"':
+                                campo = self.lista_lexema.pop(0)
+                                comillas = self.lista_lexema.pop(0)
+                                if comillas.operar(None) == '"':
+                                    coma = self.lista_lexema.pop(0)
+                                    if coma.operar(None) == ',':
+                                        sig = self.lista_lexema.pop(0)
+                                        if sig.operar(None) == '"':
+                                            valor = self.lista_lexema.pop(0)
+                                            comillas = self.lista_lexema.pop(0)
+                                            if comillas.operar(None) == '"':
+                                                parentesis = self.lista_lexema.pop(0)
+                                                if parentesis.operar(None) == ')':
+                                                    punto_coma = self.lista_lexema.pop(0)
+                                                    if punto_coma.operar(None) == ';':
+
+                                                        resultado = self.contar_si(campo.operar(None), valor.operar(None))
+
+                                                        return Contarsi(resultado, lexema.obtener_Fila(), lexema.obtener_Columna())
+                                                    else:
+                                                        error = Errores((len(self.lista_errores_sintacticos)+1), punto_coma.operar(None), "Error sintactico", punto_coma.obtener_Fila(), punto_coma.obtener_Columna())
+                                                        self.lista_errores_sintacticos.append(error)
+                                                else:
+                                                    error = Errores((len(self.lista_errores_sintacticos)+1), parentesis.operar(None), "Error sintactico", parentesis.obtener_Fila(), parentesis.obtener_Columna())
+                                                    self.lista_errores_sintacticos.append(error)
+                                            else:
+                                                error = Errores((len(self.lista_errores_sintacticos)+1), comillas.operar(None), "Error sintactico", comillas.obtener_Fila(), comillas.obtener_Columna())
+                                                self.lista_errores_sintacticos.append(error)
+                                        elif str(sig.operar(None)).isdigit():
+                                            parentesis = self.lista_lexema.pop(0)
+                                            if parentesis.operar(None) == ')':
+                                                punto_coma = self.lista_lexema.pop(0)
+                                                if punto_coma.operar(None) == ';':
+
+                                                    resultado = self.contar_si(campo.operar(None), sig.operar(None))
+
+                                                    return Contarsi(resultado, lexema.obtener_Fila(), lexema.obtener_Columna())
+                                                else:
+                                                    error = Errores((len(self.lista_errores_sintacticos)+1), punto_coma.operar(None), "Error sintactico", punto_coma.obtener_Fila(), punto_coma.obtener_Columna())
+                                                    self.lista_errores_sintacticos.append(error)
+                                            else:
+                                                error = Errores((len(self.lista_errores_sintacticos)+1), parentesis.operar(None), "Error sintactico", parentesis.obtener_Fila(), parentesis.obtener_Columna())
+                                                self.lista_errores_sintacticos.append(error)
+                                        else:
+                                            error = Errores((len(self.lista_errores_sintacticos)+1), sig.operar(None), "Error sintactico", sig.obtener_Fila(), sig.obtener_Columna())
+                                            self.lista_errores_sintacticos.append(error)
+                                    else:
+                                        error = Errores((len(self.lista_errores_sintacticos)+1), coma.operar(None), "Error sintactico", coma.obtener_Fila(), coma.obtener_Columna())
+                                        self.lista_errores_sintacticos.append(error)
+                                else:
+                                    error = Errores((len(self.lista_errores_sintacticos)+1), comillas.operar(None), "Error sintactico", comillas.obtener_Fila(), comillas.obtener_Columna())
+                                    self.lista_errores_sintacticos.append(error)
+                            else :
+                                error = Errores((len(self.lista_errores_sintacticos)+1), comillas.operar(None), "Error sintactico", comillas.obtener_Fila(), comillas.obtener_Columna())
+                                self.lista_errores_sintacticos.append(error)
+                        else :
+                            error = Errores((len(self.lista_errores_sintacticos)+1), lexema.operar(None), "Error sintactico", lexema.obtener_Fila(), lexema.obtener_Columna())
+                            self.lista_errores_sintacticos.append(error)
                     else :
                         error = Errores((len(self.lista_errores_sintacticos)+1), lexema.operar(None), "Error sintactico", lexema.obtener_Fila(), lexema.obtener_Columna())
                         self.lista_errores_sintacticos.append(error)
@@ -620,6 +685,17 @@ class analizador:
     def get_conteo(self):
         return str(len(self.registros))
     
+    def contar_si(self, campo, valor):
+        cont = 0
+
+        index = self.claves.index(campo)
+
+        for registros in self.registros:
+            if str(registros[index]) == str(valor):
+                cont += 1
+
+        return str(cont)
+
     def generar_reporte(self, titulo):
         campos_data = ''
         registros_data = ''

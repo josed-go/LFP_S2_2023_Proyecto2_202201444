@@ -10,6 +10,7 @@ from clases.datos import *
 from clases.suma import *
 from clases.maxmin import *
 from clases.reporte import *
+from clases.contarsi import *
 
 from analizador.analizador import analizador
 
@@ -166,23 +167,20 @@ class main_page:
 
             for elemento in lista_instrucciones:
                 if isinstance(elemento, Imprimir):
-                    # if int(self.consola.index('end-1c').split('.')[0]) == 1:
-                    #     self.consola.insert(tk.END, ">>>")
+
                     imprimir_consola += elemento.ejecutarT()+" "
-                elif isinstance(elemento, Imprimirln) or isinstance(elemento, Conteo) or isinstance(elemento, Promedio) or isinstance(elemento, Datos) or isinstance(elemento, Suma) or isinstance(elemento, MaxMin):
-                    # if int(self.consola.index('end-1c').split('.')[0]) == 1:
-                    #     self.consola.insert(tk.END, ">>>")
+                elif isinstance(elemento, Imprimirln) or isinstance(elemento, Conteo) or isinstance(elemento, Promedio) or isinstance(elemento, Datos) or isinstance(elemento, Suma) or isinstance(elemento, MaxMin) or isinstance(elemento, Contarsi):
+
                     imprimir_consola += "\n"+elemento.ejecutarT()+" "
                 
                 elif isinstance(elemento, Reporte):
-                # elif isinstance(elemento, Conteo):
+
                     imprimir_consola += "\nReporte generado: "+elemento.ejecutarT()+" "
 
             lineas = [f"{flechas} {line}" for line in imprimir_consola.split('\n') if line.strip()]
             for line in lineas:
                 self.consola.insert(tk.END, line + "\n")
-        # self.consola.config(state='normal')
-            # self.consola.insert(tk.END, imprimir_consola)
+
             self.consola.config(state='disabled')
             messagebox.showinfo("Análisis exitoso", "El código se analizó exitosamente.")
         
