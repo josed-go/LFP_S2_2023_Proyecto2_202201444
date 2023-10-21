@@ -89,7 +89,7 @@ class main_page:
 
         # tem_reporte = tk.StringVar()
         # reporte = ttk.Combobox(self.menu_frame, font = self.fuente, width=16, values=["Reporte de errores", "Reporte de Tokens", "Arbol de derivación"])
-        self.reporte_tokens = tk.Button(self.menu_frame, text="Reporte de tokens", padx=5, height=1, bg="#fdf9c4", activebackground="#ffda9e")
+        self.reporte_tokens = tk.Button(self.menu_frame, text="Reporte de tokens", padx=5, height=1, bg="#fdf9c4", activebackground="#ffda9e", command = self.reporte_tokens)
         self.reporte_tokens.grid(row=0, column=3, padx=5, pady=10)
         self.reporte_tokens['font'] = self.fuente
 
@@ -188,6 +188,11 @@ class main_page:
         
     def reporte_errores(self):
         self.analizador.generar_reporte_errores()
+        messagebox.showinfo("Exito!", "El reporte se ha generado correctamente.")
+
+    def reporte_tokens(self):
+        self.analizador.generar_reporte_tokens()
+        messagebox.showinfo("Exito!", "El reporte se ha generado correctamente.")
 
     def nombre_archivo(self, nombre):
         name = os.path.basename(nombre)

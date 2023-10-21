@@ -19,6 +19,7 @@ class analizador:
         self.lista_instrucciones = []
         self.lista_errores_lexicos = []
         self.lista_errores_sintacticos = []
+        self.lista_tokens = []
 
         self.claves = []
         self.registros = []
@@ -36,6 +37,31 @@ class analizador:
             'MAX': 'max',
             'MIN': 'min',
             'EXPORTARREPORTE': 'exportarReporte'
+        }
+
+        self.tipo_tokens = {
+            'Claves': 'CLAVES',
+            'imprimir': 'IMPRIMIR',
+            'imprimirln': 'IMPRIMIRLN',
+            'Registros': 'REGISTROS',
+            'conteo': 'CONTEO',
+            'promedio': 'PROMEDIO',
+            'contarsi': 'CONTARSI',
+            'datos': 'DATOS',
+            'sumar': 'SUMAR',
+            'min': 'MIN',
+            'max': 'MAX',
+            'exportarReporte': 'EXPORTARREPORTE',
+            '=': 'IGUAL',
+            '(': 'PARINI',
+            ')': 'PARFIN',
+            '[': 'CORCHETEIN',
+            ']': 'CORCHETEFIN',
+            ';': 'PUNTOYCOMA',
+            ',': 'COMA',
+            '"': 'COMILLA',
+            '{': 'LLAVEIN',
+            '}': 'LLAVEFIN'
         }
 
         self.palabras = list(self.palabra_reservadas.values())
@@ -71,15 +97,22 @@ class analizador:
                 lexema, cadena = self.armar_lexema(cadena)
                 if lexema and cadena:
 
+                    token = 'TEXTO'
 
-                    lexm = Lexema(lexema, self.numero_linea, self.numero_columna)
+                    if lexema in self.tipo_tokens:
+                        token = self.tipo_tokens.get(lexema)
+
+
+                    lexm = Lexema(lexema, token, self.numero_linea, self.numero_columna)
                     self.lista_lexema.append(lexm)
                     if self.numero_columna == 1: self.numero_columna += 1
                     self.numero_columna += len(str(lexema))
                     puntero = 0
             elif char == "[" or char == "]" or char == "{" or char == "}" or char == "(" or char == ")" or char == ";" or char == "\"" or char == "=" or char == ",":
+                
+                token = self.tipo_tokens.get(char)
 
-                c = Lexema(char, self.numero_linea, self.numero_columna)
+                c = Lexema(char, token, self.numero_linea, self.numero_columna)
                 self.numero_columna += 1
 
                 self.lista_lexema.append(c)
@@ -92,7 +125,7 @@ class analizador:
 
                 if numero and cadena:
 
-                    num = Numero(numero, self.numero_linea, self.numero_columna)
+                    num = Numero(numero, 'NUMERO', self.numero_linea, self.numero_columna)
                     if self.numero_columna == 1: self.numero_columna += 1
 
                     self.lista_lexema.append(num)
@@ -129,12 +162,14 @@ class analizador:
         print("------------")
         print("Lexemas:")
         for lex_todos in self.lista_lexema:
-            print("Lexema:",lex_todos.lexema,"fila:",lex_todos.obtener_Fila(),"columna:",lex_todos.obtener_Columna())
+            print("Lexema:",lex_todos.lexema,'Token:', lex_todos.tipo,"fila:",lex_todos.obtener_Fila(),"columna:",lex_todos.obtener_Columna())
         # for lexema in self.lista_lexema:
         #     print("{}-lin-{} -col-{}".format(lexema.lexema, lexema.obtener_Fila(), lexema.obtener_Columna()))
         # print("ERRORES")
         # for error in self.lista_errores:
         #     print(error.lexema)
+
+        self.lista_tokens = self.lista_lexema.copy()
 
         return self.lista_lexema
 
@@ -769,8 +804,8 @@ class analizador:
         for lex in self.lista_errores_lexicos:
             errores_lexicos += f"<tr><th>{lex.lexema}</th><th>{lex.obtener_Fila()}</th><th>{lex.obtener_Columna()}</th>\n</tr>"
 
-        for lex in self.lista_errores_sintacticos:
-            errores_sintacticos += f"<tr><th>{lex.lexema}</th><th>{lex.obtener_Fila()}</th><th>{lex.obtener_Columna()}</th>\n</tr>"
+        for sin in self.lista_errores_sintacticos:
+            errores_sintacticos += f"<tr><th>{sin.lexema}</th><th>{sin.obtener_Fila()}</th><th>{sin.obtener_Columna()}</th>\n</tr>"
 
         html = f"""<!DOCTYPE html>
             <html lang="en">
@@ -804,7 +839,7 @@ class analizador:
 
                 <table>
                     <tr class="title">
-                        <th colspan="3">Errores léxicos</th>
+                        <th colspan="3">Errores lexicos</th>
                     </tr>
                     <tr>
                         <th>Token</th>
@@ -813,7 +848,7 @@ class analizador:
                     </tr>
                     {errores_lexicos}
                     <tr class="title">
-                        <th colspan="3">Errores sintácticos</th>
+                        <th colspan="3">Errores sintacticos</th>
                     </tr>
                     <tr>
                         <th>Token</th>
@@ -828,4 +863,62 @@ class analizador:
 
         file.write(html)
 
+        file.close()
+
+    def generar_reporte_tokens(self):
+        tokens = ''
+        file = open('reporte_tokens.html', 'w')
+
+        for token in self.lista_tokens:
+            tokens += f'<tr><th>{token.tipo}</th><th>{token.lexema}</th><th>{token.obtener_Fila()}</th><th>{token.obtener_Columna()}</th></tr>\n'
+        
+
+        html = f"""<!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Reporte</title>
+                </head>
+                <style>
+                    body {{
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        padding-top: 100px;
+                    }}
+                    table {{
+                        border-collapse: collapse;
+                        border: 1px solid #000;
+                        padding: 15px;
+                        text-align: center;
+                    }}
+                    tr, th {{
+                        text-align: center;
+                        padding: 15px;
+                        border: 1px solid #000;
+                    }}
+                    .title {{
+                        background-color: #fdf9c4;
+                    }}
+                </style>
+                <body>
+
+                    <table>
+                        <tr class="title">
+                            <th colspan="4">TOKENS</th>
+                        </tr>
+                        <tr>
+                            <th>Tipo Token</th>
+                            <th>Lexema</th>
+                            <th>Fila</th>
+                            <th>Columna</th>
+                        </tr>
+                        {tokens}
+                    </table>
+                    
+                </body>
+                </html>"""
+        
+        file.write(html)
         file.close()

@@ -1,8 +1,9 @@
 from clases.abstraccion import Expression
 
 class Lexema(Expression):
-    def __init__(self, lexema, fila, columna):
+    def __init__(self, lexema, tipo, fila, columna):
         self.lexema = lexema
+        self.tipo = tipo
         super().__init__(fila, columna)
 
     def operar(self, arbol):
