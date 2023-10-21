@@ -998,3 +998,12 @@ class analizador:
         
         file.write(html)
         file.close()
+
+    def limpiar_listas(self):
+        self.lista_lexema.clear()
+        self.lista_tokens.clear()
+        self.lista_instrucciones.clear()
+        self.lista_errores_lexicos.clear()
+        self.lista_errores_sintacticos.clear()
+        self.claves.clear()
+        self.registros.clear()

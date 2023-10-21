@@ -149,6 +149,9 @@ class main_page:
             messagebox.showinfo("Exito!", "El archivo se ha guardado correctamente")
 
     def analizar(self):
+        self.consola.config(state='normal')
+        self.consola.delete(1.0, tk.END)
+        self.analizador.limpiar_listas()
         imprimir_consola = ''
         flechas = ">>>"
         if self.datos_archivo != '':
@@ -176,6 +179,9 @@ class main_page:
                 elif isinstance(elemento, Reporte):
 
                     imprimir_consola += "\nReporte generado: "+elemento.ejecutarT()+" "
+
+            self.consola.config(state='normal')
+            self.consola.delete(1.0, tk.END)
 
             lineas = [f"{flechas} {line}" for line in imprimir_consola.split('\n') if line.strip()]
             for line in lineas:
