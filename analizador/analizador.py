@@ -71,28 +71,46 @@ class analizador:
         # print("aqui")
         lexema = ''
         puntero = 0
+        contador_comillas = 0
 
         while cadena:
             char = cadena[puntero]
             puntero += 1
 
             
-            if char == '#':
-                lexema, cadena = self.comentario(cadena[puntero:])
-                if lexema and cadena :
-                    self.numero_linea += 1
+            # if char == '#':
+            #     lexema, cadena = self.comentario(cadena[puntero:])
+            #     if lexema and cadena :
+            #         self.numero_linea += 1
 
-                    print("Comentario:", lexema)
-                    # self.numero_columna = 1
+            #         print("Comentario:", lexema)
+            #         # self.numero_columna = 1
+            #         puntero = 0
+            # elif char == '\'':
+            #     lexema, cadena = self.comentario(cadena[puntero:])
+            #     if lexema and cadena :
+            #         self.numero_linea += 1
+            #         # self.numero_columna = 1
+
+            #         print("Comentario Multiple:", lexema)
+            #         # self.numero_columna += len(lexema)+1
+            #         puntero = 0
+            if char == '\'':
+                contador_comillas += 1
+                if contador_comillas < 3:
+                    espacios_encontrados = 0
+                    cadena, espacios_encontrados = self.comentario_multilinea(cadena[1:])
+                    self.numero_linea += espacios_encontrados
+                    self.numero_columna = 1
+                    contador_comillas = 0
                     puntero = 0
-            elif char == '\'':
-                lexema, cadena = self.comentario(cadena[puntero:])
-                if lexema and cadena :
-                    self.numero_linea += 1
-                    # self.numero_columna = 1
-
-                    print("Comentario Multiple:", lexema)
-                    # self.numero_columna += len(lexema)+1
+                else:
+                    cadena = cadena[1:]
+                puntero = 0
+            elif char == "#":
+                lexema, cadena = self.armar_comentario(cadena[puntero:])
+                if lexema and cadena:
+                    self.numero_columna += len(str(lexema))+1
                     puntero = 0
             elif char.isalpha():
                 lexema, cadena = self.armar_lexema(cadena)
@@ -173,6 +191,33 @@ class analizador:
         self.lista_tokens = self.lista_lexema.copy()
 
         return self.lista_lexema
+    
+    def armar_comentario(self,cadena):
+        token = ''
+        puntero = ''
+        for char in cadena:
+            puntero +=char
+            if char == "\n":
+                return token, cadena[len(puntero)-1:]
+            else:
+                token += char
+        return None, None
+    
+    def comentario_multilinea(self,cadena):
+        comillas = 0
+        no_enters = 0
+        puntero = 0
+
+        for char in cadena:
+            puntero += 1
+            if comillas < 3:
+                if char == '\'':
+                    comillas += 1
+                elif char == '\n':
+                    no_enters +=1
+            else:
+                return cadena[(puntero+1):], no_enters
+        return None, None
 
     def armar_lexema(self, cadena):
         lexema = ''
