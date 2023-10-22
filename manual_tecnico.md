@@ -36,6 +36,64 @@ ventana.center_window(raiz, 1350, 850)
 raiz.mainloop()
 ```
 
+### AFD
+
+![AFD 1](/img/afd1.JPG)
+
+Claves
+
+![AFD 2](/img/afd2.JPG)
+
+Registros
+
+![AFD 3](/img/afd3.JPG)
+
+imprimir
+
+![AFD 4](/img/afd4.JPG)
+
+max
+
+![AFD 5](/img/afd5.JPG)
+
+min
+
+![AFD 6](/img/afd6.JPG)
+
+sumar
+
+![AFD 7](/img/afd7.JPG)
+
+conteo
+
+![AFD 8](/img/afd8.JPG)
+
+promedio
+
+![AFD 9](/img/afd9.JPG)
+
+datos
+
+![AFD 10](/img/afd10.JPG)
+
+exportarReporte
+
+![AFD 11](/img/afd11.JPG)
+
+contarsi
+
+![AFD 12](/img/afd12.JPG)
+
+imprimirln
+
+![AFD 13](/img/afd13.JPG)
+
+Comentario de una linea
+
+![AFD 14](/img/afd14.JPG)
+
+Comentario multilinea
+
 ### Archivo ```main_page.py```
 
 Ee encuentra toda la interfaz grafica y donde se llaman las funciones de la clase ```analizador.py``
