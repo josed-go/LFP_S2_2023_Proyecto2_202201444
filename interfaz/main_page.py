@@ -140,7 +140,7 @@ class main_page:
 
     def guardar_como(self):
         if self.editor:
-            self.archivo = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Archivo JSON", "*.json")])
+            self.archivo = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("All files", "*.bizdata")])
             self.nombre_archivo(self.archivo)
             self.datos_archivo = self.editor.get("1.0", tk.END)
             if self.archivo:
