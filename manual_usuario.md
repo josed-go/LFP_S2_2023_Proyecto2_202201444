@@ -1,4 +1,4 @@
-# *Manual de usuario Proyecto 1*
+# *Manual de usuario Proyecto 2*
 
 * *José David Góngora Olmedo*
 * *202201444*
