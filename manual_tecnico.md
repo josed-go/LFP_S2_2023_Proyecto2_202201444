@@ -36,6 +36,25 @@ ventana.center_window(raiz, 1350, 850)
 raiz.mainloop()
 ```
 
+### Gramaticas libres de contexto
+
+#### Claves
+
+![Gramatica libre de contexto claves](/img/gramatica_claves.JPG)
+
+#### Conteo y datos
+
+![Gramatica libre de contexto conteo y datos](/img/gramatica_cont-dato.JPG)
+
+
+#### Imprimir, imprimirln, promedio, sumar, max, min, exportarReporte
+
+![Gramatica libre de contexto mayoria](/img/gramatica_mayo.JPG)
+
+#### Contarsi
+
+![Gramatica libre de contexto contarsi](/img/gramatica_contarsi.JPG)
+
 ### AFD
 
 ![AFD 1](/img/afd1.JPG)
